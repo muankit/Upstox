@@ -50,7 +50,10 @@ enum class Status {
 fun Throwable.getErrorMessage(): String? {
     return try {
         when (this) {
-            is IOException -> "Please check your internet connection"
+            is IOException -> {
+                println(this.printStackTrace())
+                "Please check your internet connection"
+            }
             is HttpException -> {
                 // Handling most common APIs error message pattern
                 val errorBody = response()?.errorBody()?.string()

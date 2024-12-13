@@ -12,22 +12,17 @@ class HoldingsRepoImpl @Inject constructor(
 ) : HoldingsRepo {
     override suspend fun getHoldings(fetchFromRemote: Boolean): List<UserHolding> {
         return if (fetchFromRemote) {
-            try {
-                val holdings = remoteDataSource.getHoldings()
+            val holdings = remoteDataSource.getHoldings()
 
-                val existingHoldings = localDataSource.getHoldings()
-                val newHoldings = holdings.filter { holding ->
-                    existingHoldings.none { it.symbol == holding.symbol }
-                }
-
-                if (newHoldings.isNotEmpty()) {
-                    localDataSource.insertHoldings(newHoldings.toHoldingsEntityList())
-                }
-                holdings
-            } catch (e: Exception) {
-                e.printStackTrace()
-                listOf()
+            val existingHoldings = localDataSource.getHoldings()
+            val newHoldings = holdings.filter { holding ->
+                existingHoldings.none { it.symbol == holding.symbol }
             }
+
+            if (newHoldings.isNotEmpty()) {
+                localDataSource.insertHoldings(newHoldings.toHoldingsEntityList())
+            }
+            holdings
         } else {
             localDataSource.getHoldings()
         }
